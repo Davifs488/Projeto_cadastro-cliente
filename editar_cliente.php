@@ -1,11 +1,23 @@
 <?php
 
+include('conexao.php');
+$id = intval($_GET['id']);
+// $id = intval($_GET['id']);
+// $sql_cliente = "SELECT * FROM clientes WHERE id = '$id'";
+// $query_cliente = $mysqli->query($sql_cliente) or die($mysqli->error);
+// $cliente = $query_cliente->fetch_assoc();
+
+
+
 function limpar_texto($str){
-  return preg_replace("/[^0-9]/","",$str);
+ return preg_replace("/[^0-9]/","",$str);
  }
+
+// $erro = false;
+
 if(count($_POST) > 0){
 
-    include('conexao.php');
+  
     $erro = false;
     $nome = $_POST["nome"];
     $email = $_POST["email"];
@@ -41,61 +53,69 @@ if(count($_POST) > 0){
     if($erro){
         echo "<p><b>ERRO:$erro</b></p>";
     }else{
-     $sql_code = "INSERT INTO clientes (nome, email, telefone, nascimento, data)
-      VALUES('$nome','$email','$telefone','$nascimento', NOW())"; 
+     $sql_code = "UPDATE clientes
+     SET nome = '$nome',
+     email = '$email',
+     telefone = '$telefone',
+     nascimento = '$nascimento' 
+     WHERE id = '$id' ";   
+     
+    //   clientes (nome, email, telefone, nascimento, data)
+    //   VALUES('$nome','$email','$telefone','$nascimento', NOW())"; 
      $deu_certo = $mysqli->query($sql_code) or die($mysqli->error); 
      if($deu_certo){
-        echo "<p><b>Cliente cadastrado com sucesso !!!</b></p>";
+        echo "<p><b>Cliente atualizado com sucesso !!!</b></p>";
          unset($_POST);
-
      }
 
     }
 }
+// $id = intval($_GET['id']);
+$sql_cliente = "SELECT * FROM clientes WHERE id = '$id'";
+$query_cliente = $mysqli->query($sql_cliente) or die($mysqli->error);
+$cliente = $query_cliente->fetch_assoc();
+
+
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastrar Cliente</title>
+    <title>editar_cliente</title>
 </head>
 
 <body>
+    <a href="/projetos/editar_clientes.php?id"></a>
 
-    <a href="/projetos/clientes.php">Voltar para a lista</a>
-
+    <a href="/projetos/cadastrar_cliente.php">Cadastrar cliente</a>
     <form method="POST" action="">
-
         <p>
             <label>Nome:</label>
-            <input value="<?php if(isset($_POST['nome'])) echo $_POST['nome']; ?>" name="nome" type="text">
+            <input value="<?php echo $cliente['nome']; ?>" name="nome" type="text">
         </p>
 
         <p>
             <label>E-mail:</label>
-            <input value="<?php if(isset($_POST['email'])) echo $_POST['email']; ?>" name="email" type="text">
+            <input value="<?php echo $cliente['email']; ?>" name="email" type="text">
         </p>
 
         <p>
             <label>Telefone:</label>
-            <input value="<?php if(isset($_POST['telefone'])) echo $_POST['telefone']; ?>" placeholder="(21)0000-0000"
-                name="telefone" type="text">
+            <input value="<?php if(!empty($cliente['telefone'])) echo formatar_telefone($cliente['telefone']); ?>"
+                placeholder="(21)0000-0000" name="telefone" type="text">
         </p>
 
         <p>
             <label>Data de Nascimento:</label>
-            <input value="<?php if(isset($_POST['nascimento'])) echo $_POST['nascimento']; ?>" name="nascimento"
-                type="text">
+            <input value="<?php if(!empty($cliente['nascimento'])) echo formatar_data($cliente['nascimento']); ?>"
+                name="nascimento" type="text">
         </p>
 
         <button type="submit">Salvar Cliente</button>
 
     </form>
-
 
 </body>
 
